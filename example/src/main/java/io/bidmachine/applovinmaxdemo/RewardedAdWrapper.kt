@@ -13,7 +13,7 @@ import io.bidmachine.rewarded.RewardedListener
 import io.bidmachine.rewarded.RewardedRequest
 import io.bidmachine.utils.BMError
 
-class RewardedAdWrapper : AdWrapper {
+class RewardedAdWrapper : FullscreenAdWrapper {
 
     companion object {
         private const val MAX_AD_UNIT = "YOUR_REWARDED_AD_UNIT_ID"
@@ -29,6 +29,8 @@ class RewardedAdWrapper : AdWrapper {
     override fun loadAd(activity: Activity, adWrapperLoadListener: AdWrapperLoadListener) {
         destroy()
 
+        Log.d(TAG, "Loading MAX rewarded")
+
         bidMachineRewardedAd = RewardedAd(activity).apply {
             setListener(BidMachineRewardedListener(adWrapperLoadListener))
         }
@@ -41,18 +43,15 @@ class RewardedAdWrapper : AdWrapper {
     /**
      * Load the BidMachine ad object with price floor if you want to get more expensive ads.
      */
-    private fun loadBidMachine(maxRevenue: Double) {
+    private fun loadBidMachine(maxRevenue: Double?) {
+        Log.d(TAG, "Loading BidMachine rewarded")
+
         RewardedRequest.Builder()
-                .apply {
-                    val priceFloorParams = definePriceFloorParams(maxRevenue)
-                    if (priceFloorParams != null) {
-                        setPriceFloorParams(priceFloorParams)
-                    }
-                }
-                .build()
-                .also {
-                    bidMachineRewardedAd?.load(it)
-                }
+            .setPriceFloorParams(definePriceFloorParams(maxRevenue))
+            .build()
+            .also {
+                bidMachineRewardedAd?.load(it)
+            }
     }
 
     /**
@@ -61,13 +60,17 @@ class RewardedAdWrapper : AdWrapper {
     override fun showAd() {
         when {
             isBidMachineCanShow() -> {
+                Log.d(TAG, "Showing BidMachine rewarded")
+
                 bidMachineRewardedAd?.show()
             }
             isMaxCanShow() -> {
+                Log.d(TAG, "Showing MAX rewarded")
+
                 maxRewardedAd?.showAd()
             }
             else -> {
-                Log.d(TAG, "Nothing to show.")
+                Log.d(TAG, "Nothing to show")
             }
         }
     }
@@ -81,6 +84,8 @@ class RewardedAdWrapper : AdWrapper {
     }
 
     override fun destroy() {
+        Log.d(TAG, "Destroying rewarded")
+
         maxRewardedAd?.destroy()
         maxRewardedAd = null
 
@@ -93,7 +98,6 @@ class RewardedAdWrapper : AdWrapper {
 
         override fun onAdLoaded(maxAd: MaxAd) {
             Log.d(TAG, "MAX rewarded - onAdLoaded, with revenue - ${maxAd.revenue}")
-            Log.d(TAG, "Trying load BidMachine rewarded")
 
             loadBidMachine(maxAd.revenue)
         }
@@ -101,7 +105,7 @@ class RewardedAdWrapper : AdWrapper {
         override fun onAdLoadFailed(adUnitId: String, maxError: MaxError) {
             Log.d(TAG, "MAX rewarded - onAdLoadFailed, with error - ${maxError.message}")
 
-            loadBidMachine(-1.0)
+            loadBidMachine(null)
         }
 
         override fun onAdDisplayed(maxAd: MaxAd) {
@@ -134,7 +138,8 @@ class RewardedAdWrapper : AdWrapper {
 
     }
 
-    private inner class BidMachineRewardedListener(private val adWrapperLoadListener: AdWrapperLoadListener) : RewardedListener {
+    private inner class BidMachineRewardedListener(private val adWrapperLoadListener: AdWrapperLoadListener) :
+        RewardedListener {
 
         override fun onAdLoaded(rewardedAd: RewardedAd) {
             Log.d(TAG, "BidMachine rewarded - onAdLoaded, with eCPM - ${rewardedAd.auctionResult?.price}")

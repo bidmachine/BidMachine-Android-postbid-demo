@@ -1,6 +1,6 @@
 # BidMachine-Android-Applovin-MAX-Demo
 
-[<img src="https://img.shields.io/badge/SDK%20Version-1.8.0-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
+[<img src="https://img.shields.io/badge/SDK%20Version-1.8.1-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
 [<img src="https://img.shields.io/badge/Applovin%20MAX%20Version-10.3.5-blue">](https://dash.applovin.com/documentation/mediation/android/getting-started/integration)
 
 * [Overview](#overview)
@@ -45,5 +45,6 @@ Applovin MAX, therefore the you will gain more revenue from that.
 
 ## Sample
 
+* [Banner](example/src/main/java/io/bidmachine/applovinmaxdemo/BannerAdWrapper.kt)
 * [Interstitial](example/src/main/java/io/bidmachine/applovinmaxdemo/InterstitialAdWrapper.kt)
 * [Rewarded](example/src/main/java/io/bidmachine/applovinmaxdemo/RewardedAdWrapper.kt)

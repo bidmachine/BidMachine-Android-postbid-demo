@@ -14,7 +14,7 @@ interface AdWrapper {
      * If price floor does not defined, no need to create instance of PriceFloorParams.
      * By default will be used PriceFloorParams with price floor of 0.01.
      */
-    fun definePriceFloorParams(maxRevenue: Double): PriceFloorParams? {
+    fun definePriceFloorParams(maxRevenue: Double?): PriceFloorParams? {
         return definePriceFloor(maxRevenue)?.let { priceFloor ->
             Log.d(TAG, "BidMachine price floor - $priceFloor")
 
@@ -26,8 +26,8 @@ interface AdWrapper {
      * If Applovin MAX return revenue it must be converted to price floor,
      * otherwise no need price floor (by default it will be 0.01) or you can set your price floor.
      */
-    private fun definePriceFloor(maxRevenue: Double): Double? {
-        return if (maxRevenue > 0) {
+    private fun definePriceFloor(maxRevenue: Double?): Double? {
+        return if (maxRevenue != null && maxRevenue > 0) {
             maxRevenue * 1000
         } else {
             null
@@ -35,8 +35,6 @@ interface AdWrapper {
     }
 
     fun loadAd(activity: Activity, adWrapperLoadListener: AdWrapperLoadListener)
-
-    fun showAd()
 
     fun destroy()
 

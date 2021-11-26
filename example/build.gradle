@@ -39,6 +39,6 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.4.0"
     implementation "com.google.android.material:material:1.4.0"
 
-    implementation "io.bidmachine:ads:1.8.0"
+    implementation "io.bidmachine:ads:1.8.1"
     implementation "com.applovin:applovin-sdk:10.3.5"
 }

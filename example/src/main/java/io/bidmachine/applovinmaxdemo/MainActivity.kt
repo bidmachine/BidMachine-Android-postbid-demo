@@ -15,8 +15,9 @@ class MainActivity : AppCompatActivity() {
         private const val MEDIATION_PROVIDER = "max"
     }
 
-    private val interstitialAdWrapper: InterstitialAdWrapper = InterstitialAdWrapper()
-    private val rewardedAdWrapper: RewardedAdWrapper = RewardedAdWrapper()
+    private val bannerAdWrapper = BannerAdWrapper()
+    private val interstitialAdWrapper = InterstitialAdWrapper()
+    private val rewardedAdWrapper = RewardedAdWrapper()
 
     private lateinit var binding: ActivityMainBinding
 
@@ -26,6 +27,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater).apply {
             setContentView(root)
 
+            bLoadBanner.setOnClickListener {
+                bShowBanner.isEnabled = false
+                bannerAdWrapper.loadAd(this@MainActivity, BannerAdWrapperLoadListener())
+            }
+            bShowBanner.setOnClickListener {
+                bannerAdWrapper.showAd(adContainer)
+            }
             bLoadInterstitial.setOnClickListener {
                 bShowInterstitial.isEnabled = false
                 interstitialAdWrapper.loadAd(this@MainActivity, InterstitialAdWrapperLoadListener())
@@ -57,6 +65,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    private inner class BannerAdWrapperLoadListener : AdWrapperLoadListener {
+
+        override fun onAdLoaded() {
+            binding.bShowBanner.isEnabled = true
+        }
+
+        override fun onAdFailToLoad() {
+            Toast.makeText(this@MainActivity, "Banner fail to load", Toast.LENGTH_SHORT).show()
+        }
+
+    }
 
     private inner class InterstitialAdWrapperLoadListener : AdWrapperLoadListener {
 

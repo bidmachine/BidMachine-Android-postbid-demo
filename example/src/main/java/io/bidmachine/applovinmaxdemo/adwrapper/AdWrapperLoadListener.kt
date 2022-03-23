@@ -1,4 +1,4 @@
-package io.bidmachine.applovinmaxdemo
+package io.bidmachine.applovinmaxdemo.adwrapper
 
 interface AdWrapperLoadListener {
 

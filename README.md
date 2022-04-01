@@ -34,6 +34,12 @@ Loading the Applovin MAX ad object may finish with two results: ```onAdLoaded```
 
 * If loading did not complete successfully, then start loading post bid networks, either without price, or specify the
   price you need.
+  
+> Please note that MAX banners has auto-refresh enabled by default. 
+> You must turn it off after ad was loaded.
+> ```java
+> MaxAdView#stopAutoRefresh()
+> ```
 
 ## Showing the loaded ad object
 

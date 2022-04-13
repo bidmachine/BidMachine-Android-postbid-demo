@@ -1,4 +1,4 @@
-# BidMachine-Android-Applovin-MAX-Demo
+# BidMachine Android PostBid Demo
 
 [<img src="https://img.shields.io/badge/SDK%20Version-1.9.2-brightgreen">](https://github.com/bidmachine/BidMachine-Android-SDK)
 [<img src="https://img.shields.io/badge/Applovin%20MAX%20Version-11.3.1-blue">](https://dash.applovin.com/documentation/mediation/android/getting-started/integration)

@@ -2,9 +2,8 @@ package io.bidmachine.applovinmaxdemo.ad.bidmachine
 
 import android.app.Activity
 import io.bidmachine.applovinmaxdemo.Utils
-import io.bidmachine.applovinmaxdemo.ad.AdObject
-import io.bidmachine.applovinmaxdemo.ad.AdObjectLoadListener
 import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObject
+import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObjectListener
 import io.bidmachine.applovinmaxdemo.ad.bidmachine.BidMachineAdObjectUtils.toPriceFloorParams
 import io.bidmachine.interstitial.InterstitialAd
 import io.bidmachine.interstitial.InterstitialListener
@@ -15,12 +14,12 @@ class BidMachineInterstitialAdObject : FullscreenAdObject() {
 
     private var interstitialAd: InterstitialAd? = null
 
-    override fun load(activity: Activity, priceFloor: Double?, loadListener: AdObjectLoadListener<AdObject>) {
+    override fun load(activity: Activity, priceFloor: Double?, listener: FullscreenAdObjectListener) {
         val request = InterstitialRequest.Builder()
                 .setPriceFloorParams(priceFloor?.toPriceFloorParams())
                 .build()
         interstitialAd = InterstitialAd(activity).apply {
-            setListener(Listener(loadListener))
+            setListener(Listener(listener))
             load(request)
         }
     }
@@ -42,18 +41,18 @@ class BidMachineInterstitialAdObject : FullscreenAdObject() {
     }
 
 
-    private inner class Listener(private val loadListener: AdObjectLoadListener<AdObject>) : InterstitialListener {
+    private inner class Listener(private val listener: FullscreenAdObjectListener) : InterstitialListener {
 
         override fun onAdLoaded(interstitialAd: InterstitialAd) {
-            loadListener.onLoaded(this@BidMachineInterstitialAdObject)
+            listener.onLoaded(this@BidMachineInterstitialAdObject)
         }
 
         override fun onAdLoadFailed(interstitialAd: InterstitialAd, bmError: BMError) {
-            loadListener.onFailToLoad(this@BidMachineInterstitialAdObject, bmError.message)
+            listener.onFailToLoad(this@BidMachineInterstitialAdObject, bmError.message)
         }
 
         override fun onAdShown(interstitialAd: InterstitialAd) {
-            Utils.log(this@BidMachineInterstitialAdObject, "onAdShown")
+            listener.onShown(this@BidMachineInterstitialAdObject)
         }
 
         override fun onAdShowFailed(interstitialAd: InterstitialAd, bmError: BMError) {
@@ -65,11 +64,11 @@ class BidMachineInterstitialAdObject : FullscreenAdObject() {
         }
 
         override fun onAdClicked(interstitialAd: InterstitialAd) {
-            Utils.log(this@BidMachineInterstitialAdObject, "onAdClicked")
+            listener.onClicked(this@BidMachineInterstitialAdObject)
         }
 
         override fun onAdClosed(interstitialAd: InterstitialAd, finished: Boolean) {
-            Utils.log(this@BidMachineInterstitialAdObject, "onAdClosed")
+            listener.onClosed(this@BidMachineInterstitialAdObject)
         }
 
         override fun onAdExpired(interstitialAd: InterstitialAd) {

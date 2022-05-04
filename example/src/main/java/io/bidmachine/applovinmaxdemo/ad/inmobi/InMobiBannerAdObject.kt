@@ -1,14 +1,13 @@
 package io.bidmachine.applovinmaxdemo.ad.inmobi
 
-import android.app.Activity
+import android.content.Context
 import android.view.View
 import com.inmobi.ads.AdMetaInfo
 import com.inmobi.ads.InMobiAdRequestStatus
 import com.inmobi.ads.InMobiBanner
 import com.inmobi.ads.listeners.BannerAdEventListener
-import io.bidmachine.applovinmaxdemo.Utils
 import io.bidmachine.applovinmaxdemo.ad.AdObject
-import io.bidmachine.applovinmaxdemo.ad.AdObjectLoadListener
+import io.bidmachine.applovinmaxdemo.ad.AdObjectListener
 import io.bidmachine.applovinmaxdemo.ad.ViewAdObject
 
 class InMobiBannerAdObject : ViewAdObject() {
@@ -21,11 +20,11 @@ class InMobiBannerAdObject : ViewAdObject() {
     private var price: Double? = null
     private var isLoaded = false
 
-    override fun load(activity: Activity, priceFloor: Double?, loadListener: AdObjectLoadListener<AdObject>) {
-        inMobiBanner = InMobiBanner(activity, PLACEMENT_ID).apply {
+    override fun load(context: Context, priceFloor: Double?, listener: AdObjectListener<AdObject>) {
+        inMobiBanner = InMobiBanner(context, PLACEMENT_ID).apply {
             setBannerSize(320, 50)
             setEnableAutoRefresh(false)
-            setListener(Listener(loadListener))
+            setListener(Listener(listener))
             load()
         }
     }
@@ -44,29 +43,29 @@ class InMobiBannerAdObject : ViewAdObject() {
     }
 
 
-    private inner class Listener(private val loadListener: AdObjectLoadListener<AdObject>) : BannerAdEventListener() {
+    private inner class Listener(private val listener: AdObjectListener<AdObject>) : BannerAdEventListener() {
 
         override fun onAdFetchFailed(inMobiBanner: InMobiBanner, inMobiAdRequestStatus: InMobiAdRequestStatus) {
-            loadListener.onFailToLoad(this@InMobiBannerAdObject, inMobiAdRequestStatus.message)
+            listener.onFailToLoad(this@InMobiBannerAdObject, inMobiAdRequestStatus.message)
         }
 
         override fun onAdLoadSucceeded(inMobiBanner: InMobiBanner, adMetaInfo: AdMetaInfo) {
             price = adMetaInfo.bid
             isLoaded = true
 
-            loadListener.onLoaded(this@InMobiBannerAdObject)
+            listener.onLoaded(this@InMobiBannerAdObject)
         }
 
         override fun onAdLoadFailed(inMobiBanner: InMobiBanner, inMobiAdRequestStatus: InMobiAdRequestStatus) {
-            loadListener.onFailToLoad(this@InMobiBannerAdObject, inMobiAdRequestStatus.message)
+            listener.onFailToLoad(this@InMobiBannerAdObject, inMobiAdRequestStatus.message)
         }
 
         override fun onAdDisplayed(inMobiBanner: InMobiBanner) {
-            Utils.log(this@InMobiBannerAdObject, "onAdDisplayed")
+            listener.onShown(this@InMobiBannerAdObject)
         }
 
         override fun onAdClicked(inMobiBanner: InMobiBanner, map: MutableMap<Any, Any>?) {
-            Utils.log(this@InMobiBannerAdObject, "onAdClicked")
+            listener.onClicked(this@InMobiBannerAdObject)
         }
 
     }

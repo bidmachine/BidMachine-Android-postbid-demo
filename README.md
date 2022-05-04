@@ -7,6 +7,7 @@
 * [Loading Applovin MAX](#loading-applovin-max)
 * [Loading post bid networks](#loading-post-bid-networks)
 * [Showing the loaded ad object](#showing-the-loaded-ad-object)
+* [Auto-refresh banner](#auto-refresh-banner)
 * [Sample](#sample)
 
 ## Overview
@@ -34,8 +35,8 @@ Loading the Applovin MAX ad object may finish with two results: ```onAdLoaded```
 
 * If loading did not complete successfully, then start loading post bid networks, either without price, or specify the
   price you need.
-  
-> Please note that MAX banners has auto-refresh enabled by default. 
+
+> Please note that MAX banners has auto-refresh enabled by default.
 > You must turn it off after ad was loaded.
 > ```java
 > MaxAdView#stopAutoRefresh()
@@ -45,8 +46,19 @@ Loading the Applovin MAX ad object may finish with two results: ```onAdLoaded```
 
 After the loading stage, you should give preference to the most expensive loaded ad object when displaying the ad.
 
+## Auto-refresh banner
+
+The auto-refresh banner contains logic for updating content based on refresh time.
+
+To get started you need:
+
+1) Set ad unit id
+2) Set auto-refresh time in milliseconds (by default 15 seconds)
+3) Perform ```loadAd``` on ```AutoRefreshBannerView```
+
 ## Sample
 
 * [Banner](example/src/main/java/io/bidmachine/applovinmaxdemo/adwrapper/BannerAdWrapper.kt)
 * [Interstitial](example/src/main/java/io/bidmachine/applovinmaxdemo/adwrapper/InterstitialAdWrapper.kt)
 * [Rewarded](example/src/main/java/io/bidmachine/applovinmaxdemo/adwrapper/RewardedAdWrapper.kt)
+* [Auto-refresh banner](example/src/main/java/io/bidmachine/applovinmaxdemo/adwrapper/AutoRefreshBannerView.kt)

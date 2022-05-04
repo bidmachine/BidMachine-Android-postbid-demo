@@ -7,52 +7,53 @@ import com.applovin.sdk.AppLovinSdk
 import com.appnexus.opensdk.SDKSettings
 import com.inmobi.sdk.InMobiSdk
 import io.bidmachine.BidMachine
-import io.bidmachine.applovinmaxdemo.adwrapper.AdWrapperLoadListener
-import io.bidmachine.applovinmaxdemo.adwrapper.BannerAdWrapper
-import io.bidmachine.applovinmaxdemo.adwrapper.InterstitialAdWrapper
-import io.bidmachine.applovinmaxdemo.adwrapper.RewardedAdWrapper
+import io.bidmachine.applovinmaxdemo.adwrapper.*
 import io.bidmachine.applovinmaxdemo.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        private const val BID_MACHINE_SELLER_ID = "5"
-        private const val INMOBI_ACCOUNT_ID = "_____YOUR_INMOBI_ACCOUNT_ID_____"
         private const val MEDIATION_PROVIDER = "max"
-        private const val BANNER_MAX_AD_UNIT_ID = "YOUR_BANNER_AD_UNIT_ID"
-        private const val INTERSTITIAL_MAX_AD_UNIT_ID = "YOUR_INTERSTITIAL_AD_UNIT_ID"
-        private const val REWARDED_MAX_AD_UNIT_ID = "YOUR_REWARDED_AD_UNIT_ID"
     }
 
-    private val bannerAdWrapper = BannerAdWrapper(BANNER_MAX_AD_UNIT_ID)
-    private val interstitialAdWrapper = InterstitialAdWrapper(INTERSTITIAL_MAX_AD_UNIT_ID)
-    private val rewardedAdWrapper = RewardedAdWrapper(REWARDED_MAX_AD_UNIT_ID)
+    private lateinit var bannerAdWrapper: BannerAdWrapper
+    private lateinit var interstitialAdWrapper: InterstitialAdWrapper
+    private lateinit var rewardedAdWrapper: RewardedAdWrapper
 
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        bannerAdWrapper = BannerAdWrapper(getString(R.string.banner_max_ad_unit_id))
+        interstitialAdWrapper = InterstitialAdWrapper(getString(R.string.interstitial_max_ad_unit_id))
+        rewardedAdWrapper = RewardedAdWrapper(getString(R.string.rewarded_max_ad_unit_id))
+
         binding = ActivityMainBinding.inflate(layoutInflater).apply {
             setContentView(root)
 
+            bOpenAutoRefreshActivity.setOnClickListener {
+                AutoRefreshActivity.createIntent(this@MainActivity).also { intent ->
+                    startActivity(intent)
+                }
+            }
             bLoadBanner.setOnClickListener {
                 bShowBanner.isEnabled = false
-                bannerAdWrapper.loadAd(this@MainActivity, BannerAdWrapperLoadListener())
+                bannerAdWrapper.loadAd(this@MainActivity, BannerAdWrapperListener())
             }
             bShowBanner.setOnClickListener {
                 bannerAdWrapper.showAd(adContainer)
             }
             bLoadInterstitial.setOnClickListener {
                 bShowInterstitial.isEnabled = false
-                interstitialAdWrapper.loadAd(this@MainActivity, InterstitialAdWrapperLoadListener())
+                interstitialAdWrapper.loadAd(this@MainActivity, InterstitialAdWrapperListener())
             }
             bShowInterstitial.setOnClickListener {
                 interstitialAdWrapper.showAd()
             }
             bLoadRewarded.setOnClickListener {
                 bShowRewarded.isEnabled = false
-                rewardedAdWrapper.loadAd(this@MainActivity, RewardedAdWrapperLoadListener())
+                rewardedAdWrapper.loadAd(this@MainActivity, RewardedAdWrapperListener())
             }
             bShowRewarded.setOnClickListener {
                 rewardedAdWrapper.showAd()
@@ -65,10 +66,10 @@ class MainActivity : AppCompatActivity() {
     private fun initializeSdk() {
         BidMachine.setLoggingEnabled(true)
         BidMachine.setTestMode(true)
-        BidMachine.initialize(this, BID_MACHINE_SELLER_ID)
+        BidMachine.initialize(this, getString(R.string.bid_machine_seller_id))
 
         InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG)
-        InMobiSdk.init(this, INMOBI_ACCOUNT_ID, null, null)
+        InMobiSdk.init(this, getString(R.string.inmobi_account_id), null, null)
 
         SDKSettings.enableTestMode(true)
         SDKSettings.init(this, {}, true, true)
@@ -80,7 +81,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private inner class BannerAdWrapperLoadListener : AdWrapperLoadListener {
+    private inner class BannerAdWrapperListener : AdWrapperListener {
 
         override fun onAdLoaded() {
             binding.bShowBanner.isEnabled = true
@@ -90,9 +91,17 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, "Banner fail to load", Toast.LENGTH_SHORT).show()
         }
 
+        override fun onAdShown() {
+            Toast.makeText(this@MainActivity, "Banner shown", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onAdClicked() {
+            Toast.makeText(this@MainActivity, "Banner clicked", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
-    private inner class InterstitialAdWrapperLoadListener : AdWrapperLoadListener {
+    private inner class InterstitialAdWrapperListener : FullscreenAdWrapperListener {
 
         override fun onAdLoaded() {
             binding.bShowInterstitial.isEnabled = true
@@ -102,9 +111,21 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, "Interstitial fail to load", Toast.LENGTH_SHORT).show()
         }
 
+        override fun onAdShown() {
+            Toast.makeText(this@MainActivity, "Interstitial shown", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onAdClicked() {
+            Toast.makeText(this@MainActivity, "Interstitial clicked", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onAdClosed() {
+            Toast.makeText(this@MainActivity, "Interstitial closed", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
-    private inner class RewardedAdWrapperLoadListener : AdWrapperLoadListener {
+    private inner class RewardedAdWrapperListener : FullscreenAdWrapperListener {
 
         override fun onAdLoaded() {
             binding.bShowRewarded.isEnabled = true
@@ -112,6 +133,18 @@ class MainActivity : AppCompatActivity() {
 
         override fun onAdFailToLoad() {
             Toast.makeText(this@MainActivity, "Rewarded fail to load", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onAdShown() {
+            Toast.makeText(this@MainActivity, "Rewarded shown", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onAdClicked() {
+            Toast.makeText(this@MainActivity, "Rewarded clicked", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onAdClosed() {
+            Toast.makeText(this@MainActivity, "Rewarded closed", Toast.LENGTH_SHORT).show()
         }
 
     }

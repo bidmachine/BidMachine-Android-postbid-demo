@@ -6,9 +6,8 @@ import com.inmobi.ads.InMobiAdRequestStatus
 import com.inmobi.ads.InMobiInterstitial
 import com.inmobi.ads.listeners.InterstitialAdEventListener
 import io.bidmachine.applovinmaxdemo.Utils
-import io.bidmachine.applovinmaxdemo.ad.AdObject
-import io.bidmachine.applovinmaxdemo.ad.AdObjectLoadListener
 import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObject
+import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObjectListener
 
 abstract class InMobiFullscreenAdObject : FullscreenAdObject() {
 
@@ -17,8 +16,8 @@ abstract class InMobiFullscreenAdObject : FullscreenAdObject() {
 
     abstract fun getPlacementId(): Long
 
-    override fun load(activity: Activity, priceFloor: Double?, loadListener: AdObjectLoadListener<AdObject>) {
-        inMobiInterstitial = InMobiInterstitial(activity, getPlacementId(), Listener(loadListener)).apply {
+    override fun load(activity: Activity, priceFloor: Double?, listener: FullscreenAdObjectListener) {
+        inMobiInterstitial = InMobiInterstitial(activity, getPlacementId(), Listener(listener)).apply {
             load()
         }
     }
@@ -37,27 +36,27 @@ abstract class InMobiFullscreenAdObject : FullscreenAdObject() {
     }
 
 
-    private inner class Listener(private val loadListener: AdObjectLoadListener<AdObject>) :
+    private inner class Listener(private val listener: FullscreenAdObjectListener) :
             InterstitialAdEventListener() {
 
         override fun onAdFetchFailed(inMobiInterstitial: InMobiInterstitial,
                                      inMobiAdRequestStatus: InMobiAdRequestStatus) {
-            loadListener.onFailToLoad(this@InMobiFullscreenAdObject, inMobiAdRequestStatus.message)
+            listener.onFailToLoad(this@InMobiFullscreenAdObject, inMobiAdRequestStatus.message)
         }
 
         override fun onAdLoadSucceeded(inMobiInterstitial: InMobiInterstitial, adMetaInfo: AdMetaInfo) {
             price = adMetaInfo.bid
 
-            loadListener.onLoaded(this@InMobiFullscreenAdObject)
+            listener.onLoaded(this@InMobiFullscreenAdObject)
         }
 
         override fun onAdLoadFailed(inMobiInterstitial: InMobiInterstitial,
                                     inMobiAdRequestStatus: InMobiAdRequestStatus) {
-            loadListener.onFailToLoad(this@InMobiFullscreenAdObject, inMobiAdRequestStatus.message)
+            listener.onFailToLoad(this@InMobiFullscreenAdObject, inMobiAdRequestStatus.message)
         }
 
         override fun onAdDisplayed(inMobiInterstitial: InMobiInterstitial, adMetaInfo: AdMetaInfo) {
-            Utils.log(this@InMobiFullscreenAdObject, "onAdDisplayed")
+            listener.onShown(this@InMobiFullscreenAdObject)
         }
 
         override fun onAdDisplayFailed(inMobiInterstitial: InMobiInterstitial) {
@@ -65,11 +64,11 @@ abstract class InMobiFullscreenAdObject : FullscreenAdObject() {
         }
 
         override fun onAdClicked(inMobiInterstitial: InMobiInterstitial, map: MutableMap<Any, Any>?) {
-            Utils.log(this@InMobiFullscreenAdObject, "onAdClicked")
+            listener.onClicked(this@InMobiFullscreenAdObject)
         }
 
         override fun onAdDismissed(inMobiInterstitial: InMobiInterstitial) {
-            Utils.log(this@InMobiFullscreenAdObject, "onAdDismissed")
+            listener.onClosed(this@InMobiFullscreenAdObject)
         }
 
     }

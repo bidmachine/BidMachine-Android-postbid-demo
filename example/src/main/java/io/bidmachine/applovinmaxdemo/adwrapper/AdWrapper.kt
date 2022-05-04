@@ -1,38 +1,40 @@
 package io.bidmachine.applovinmaxdemo.adwrapper
 
-import android.app.Activity
 import androidx.annotation.CallSuper
 import io.bidmachine.applovinmaxdemo.Utils
 import io.bidmachine.applovinmaxdemo.ad.AdObject
-import io.bidmachine.applovinmaxdemo.ad.AdObjectLoadListener
-import java.lang.ref.WeakReference
+import io.bidmachine.applovinmaxdemo.ad.AdObjectListener
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class AdWrapper<AdObjectType : AdObject>(val adUnitId: String) {
+abstract class AdWrapper<AdWrapperListenerType : AdWrapperListener, AdObjectType : AdObject>(val adUnitId: String) {
 
     private val loadedAdList: MutableList<AdObjectType> = mutableListOf()
 
-    private var weakActivity: WeakReference<Activity>? = null
-    private var loadListener: AdWrapperLoadListener? = null
+    protected var listener: AdWrapperListenerType? = null
+
+    private var maxAdObject: AdObjectType? = null
     private var postBidAdObjectList: List<AdObjectType>? = null
     private var postBidAdObjectInProgressCount = AtomicInteger()
 
-    @CallSuper
-    open fun loadAd(activity: Activity, adWrapperLoadListener: AdWrapperLoadListener) {
-        destroy()
-        weakActivity = WeakReference(activity)
-        loadListener = adWrapperLoadListener
+    abstract fun createMaxAdObject(): AdObjectType
 
-        Utils.log(this, "loadAd")
+    @CallSuper
+    protected fun setupMaxAdObject(adWrapperListener: AdWrapperListenerType): AdObjectType {
+        destroy()
+        listener = adWrapperListener
+
+        Utils.log(this, "setup max")
+
+        return createMaxAdObject().apply {
+            maxAdObject = this
+        }
     }
 
     @CallSuper
     open fun destroy() {
         Utils.log(this, "destroy")
 
-        weakActivity?.clear()
-        weakActivity = null
-        loadListener = null
+        listener = null
         postBidAdObjectList?.forEach {
             it.destroy()
         }
@@ -41,6 +43,8 @@ abstract class AdWrapper<AdObjectType : AdObject>(val adUnitId: String) {
             it.destroy()
         }
         loadedAdList.clear()
+        maxAdObject?.destroy()
+        maxAdObject = null
     }
 
     /**
@@ -52,24 +56,25 @@ abstract class AdWrapper<AdObjectType : AdObject>(val adUnitId: String) {
      * Starts load all PostBid ad objects which have been received from [createPostBidAdObjectList].
      */
     protected fun loadPostBidAds(priceFloor: Double?) {
-        val activity = weakActivity?.get()
-        if (activity == null) {
-            onAdLoadingComplete()
-            return
-        }
-        postBidAdObjectList = createPostBidAdObjectList().also {
-            if (it.isEmpty()) {
+        postBidAdObjectList = createPostBidAdObjectList().also { adObjectList ->
+            if (adObjectList.isEmpty()) {
                 onAdLoadingComplete()
                 return
             }
-            Utils.log(this, "loadPostBidAds, price floor - $priceFloor, count - ${it.size}")
+            Utils.log(this, "loadPostBidAds, price floor - $priceFloor, count - ${adObjectList.size}")
 
-            postBidAdObjectInProgressCount.set(it.size)
-            it.forEach { adObject ->
-                adObject.load(activity, priceFloor, PostBidLoadListener())
+            postBidAdObjectInProgressCount.set(adObjectList.size)
+
+            adObjectList.forEach { adObject ->
+                loadPostBidAd(adObject, priceFloor)
             }
         }
     }
+
+    /**
+     * Starts load PostBid ad object.
+     */
+    protected abstract fun loadPostBidAd(adObject: AdObjectType, priceFloor: Double?)
 
     /**
      * Gets AdObject with highest price to show.
@@ -89,7 +94,7 @@ abstract class AdWrapper<AdObjectType : AdObject>(val adUnitId: String) {
         loadedAdList.add(adObject)
     }
 
-    private fun onPostBidLoadingComplete() {
+    private fun onPostBidAdLoadingComplete() {
         val inProgressCount = postBidAdObjectInProgressCount.decrementAndGet()
         if (inProgressCount == 0) {
             onAdLoadingComplete()
@@ -98,46 +103,79 @@ abstract class AdWrapper<AdObjectType : AdObject>(val adUnitId: String) {
         }
     }
 
+    protected fun onPostBidAdLoadFail(adObject: AdObjectType, errorMessage: String) {
+        Utils.log(adObject, "PostBid onFailToLoad, error - $errorMessage", true)
+
+        onPostBidAdLoadingComplete()
+    }
+
     private fun onAdLoadingComplete() {
         val loadedCount = loadedAdList.size
         if (loadedCount == 0) {
-            Utils.log(this, "onAdFailToLoad")
+            Utils.log(this, "onAdFailToLoad", true)
 
-            loadListener?.onAdFailToLoad()
+            listener?.onAdFailToLoad()
         } else {
             Utils.log(this, "onAdLoaded, count of loaded object - $loadedCount")
 
-            loadListener?.onAdLoaded()
+            listener?.onAdLoaded()
         }
     }
 
 
-    inner class LoadListener : AdObjectLoadListener<AdObjectType> {
+    open inner class Listener : BaseListener() {
 
+        @CallSuper
         override fun onLoaded(adObject: AdObjectType) {
-            onAdObjectLoaded(adObject)
+            super.onLoaded(adObject)
+
             loadPostBidAds(adObject.getPrice())
         }
 
+        @CallSuper
         override fun onFailToLoad(adObject: AdObjectType, errorMessage: String) {
-            Utils.log(this, "onFailToLoad, error - $errorMessage")
+            Utils.log(this, "onFailToLoad, error - $errorMessage", true)
 
             loadPostBidAds(null)
         }
 
     }
 
-    private inner class PostBidLoadListener : AdObjectLoadListener<AdObjectType> {
+    open inner class PostBidListener : BaseListener() {
 
+        @CallSuper
         override fun onLoaded(adObject: AdObjectType) {
-            onAdObjectLoaded(adObject)
-            onPostBidLoadingComplete()
+            super.onLoaded(adObject)
+
+            onPostBidAdLoadingComplete()
         }
 
+        @CallSuper
         override fun onFailToLoad(adObject: AdObjectType, errorMessage: String) {
-            Utils.log(adObject, "PostBid onFailToLoad, error - $errorMessage")
+            onPostBidAdLoadFail(adObject, errorMessage)
+        }
 
-            onPostBidLoadingComplete()
+    }
+
+    abstract inner class BaseListener : AdObjectListener<AdObjectType> {
+
+        @CallSuper
+        override fun onLoaded(adObject: AdObjectType) {
+            onAdObjectLoaded(adObject)
+        }
+
+        @CallSuper
+        override fun onShown(adObject: AdObjectType) {
+            Utils.log(adObject, "onShown")
+
+            listener?.onAdShown()
+        }
+
+        @CallSuper
+        override fun onClicked(adObject: AdObjectType) {
+            Utils.log(adObject, "onClicked")
+
+            listener?.onAdClicked()
         }
 
     }

@@ -1,9 +1,13 @@
 package io.bidmachine.applovinmaxdemo.adwrapper
 
-interface AdWrapperLoadListener {
+interface AdWrapperListener {
 
     fun onAdLoaded()
 
     fun onAdFailToLoad()
+
+    fun onAdShown()
+
+    fun onAdClicked()
 
 }

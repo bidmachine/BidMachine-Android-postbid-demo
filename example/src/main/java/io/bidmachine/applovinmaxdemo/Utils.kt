@@ -1,5 +1,6 @@
 package io.bidmachine.applovinmaxdemo
 
+import android.content.Context
 import android.content.res.Resources
 import android.util.Log
 import android.util.TypedValue
@@ -12,17 +13,27 @@ object Utils {
 
     fun createLayoutParams(resources: Resources, height: Int): ViewGroup.LayoutParams {
         return ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                      TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                                                                height.toFloat(),
-                                                                resources.displayMetrics).roundToInt())
+                                      dp2px(resources, height.toFloat()))
     }
 
-    fun log(any: Any, message: String) {
-        log(any.javaClass, message)
+    fun dp2px(context: Context, dp: Float): Int {
+        return dp2px(context.resources, dp)
     }
 
-    fun <T> log(clazz: Class<T>, message: String) {
-        Log.d(TAG, "[${clazz.simpleName}] $message")
+    fun dp2px(resources: Resources, dp: Float): Int {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).roundToInt()
+    }
+
+    fun log(any: Any, message: String, isError: Boolean = false) {
+        log(any.javaClass, message, isError)
+    }
+
+    fun <T> log(clazz: Class<T>, message: String, isError: Boolean = false) {
+        if (isError) {
+            Log.e(TAG, "[${clazz.simpleName}] $message")
+        } else {
+            Log.d(TAG, "[${clazz.simpleName}] $message")
+        }
     }
 
 }

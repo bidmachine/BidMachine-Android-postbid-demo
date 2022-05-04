@@ -2,9 +2,8 @@ package io.bidmachine.applovinmaxdemo.ad.bidmachine
 
 import android.app.Activity
 import io.bidmachine.applovinmaxdemo.Utils
-import io.bidmachine.applovinmaxdemo.ad.AdObject
-import io.bidmachine.applovinmaxdemo.ad.AdObjectLoadListener
 import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObject
+import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObjectListener
 import io.bidmachine.applovinmaxdemo.ad.bidmachine.BidMachineAdObjectUtils.toPriceFloorParams
 import io.bidmachine.rewarded.RewardedAd
 import io.bidmachine.rewarded.RewardedListener
@@ -15,12 +14,12 @@ class BidMachineRewardedAdObject : FullscreenAdObject() {
 
     private var rewardedAd: RewardedAd? = null
 
-    override fun load(activity: Activity, priceFloor: Double?, loadListener: AdObjectLoadListener<AdObject>) {
+    override fun load(activity: Activity, priceFloor: Double?, listener: FullscreenAdObjectListener) {
         val request = RewardedRequest.Builder()
                 .setPriceFloorParams(priceFloor?.toPriceFloorParams())
                 .build()
         rewardedAd = RewardedAd(activity).apply {
-            setListener(Listener(loadListener))
+            setListener(Listener(listener))
             load(request)
         }
     }
@@ -42,18 +41,18 @@ class BidMachineRewardedAdObject : FullscreenAdObject() {
     }
 
 
-    private inner class Listener(private val loadListener: AdObjectLoadListener<AdObject>) : RewardedListener {
+    private inner class Listener(private val listener: FullscreenAdObjectListener) : RewardedListener {
 
         override fun onAdLoaded(rewardedAd: RewardedAd) {
-            loadListener.onLoaded(this@BidMachineRewardedAdObject)
+            listener.onLoaded(this@BidMachineRewardedAdObject)
         }
 
         override fun onAdLoadFailed(rewardedAd: RewardedAd, bmError: BMError) {
-            loadListener.onFailToLoad(this@BidMachineRewardedAdObject, bmError.message)
+            listener.onFailToLoad(this@BidMachineRewardedAdObject, bmError.message)
         }
 
         override fun onAdShown(rewardedAd: RewardedAd) {
-            Utils.log(this@BidMachineRewardedAdObject, "onAdShown")
+            listener.onShown(this@BidMachineRewardedAdObject)
         }
 
         override fun onAdShowFailed(rewardedAd: RewardedAd, bmError: BMError) {
@@ -65,11 +64,11 @@ class BidMachineRewardedAdObject : FullscreenAdObject() {
         }
 
         override fun onAdClicked(rewardedAd: RewardedAd) {
-            Utils.log(this@BidMachineRewardedAdObject, "onAdClicked")
+            listener.onClicked(this@BidMachineRewardedAdObject)
         }
 
         override fun onAdClosed(rewardedAd: RewardedAd, finished: Boolean) {
-            Utils.log(this@BidMachineRewardedAdObject, "onAdClosed")
+            listener.onClosed(this@BidMachineRewardedAdObject)
         }
 
         override fun onAdExpired(rewardedAd: RewardedAd) {

@@ -1,11 +1,11 @@
 package io.bidmachine.applovinmaxdemo.ad.appnexus
 
-import android.app.Activity
+import android.content.Context
 import android.view.View
 import com.appnexus.opensdk.*
 import io.bidmachine.applovinmaxdemo.Utils
 import io.bidmachine.applovinmaxdemo.ad.AdObject
-import io.bidmachine.applovinmaxdemo.ad.AdObjectLoadListener
+import io.bidmachine.applovinmaxdemo.ad.AdObjectListener
 import io.bidmachine.applovinmaxdemo.ad.ViewAdObject
 
 class AppNexusBannerAdObject : ViewAdObject() {
@@ -17,12 +17,12 @@ class AppNexusBannerAdObject : ViewAdObject() {
     private var bannerAdView: BannerAdView? = null
     private var isLoaded = false
 
-    override fun load(activity: Activity, priceFloor: Double?, loadListener: AdObjectLoadListener<AdObject>) {
-        bannerAdView = BannerAdView(activity).apply {
+    override fun load(context: Context, priceFloor: Double?, listener: AdObjectListener<AdObject>) {
+        bannerAdView = BannerAdView(context).apply {
             placementID = PLACEMENT_ID
             autoRefreshInterval = 0
             setAdSize(320, 50)
-            adListener = Listener(loadListener)
+            adListener = Listener(listener)
             loadAd()
         }
     }
@@ -40,20 +40,20 @@ class AppNexusBannerAdObject : ViewAdObject() {
     }
 
 
-    private inner class Listener(private val loadListener: AdObjectLoadListener<AdObject>) : AdListener {
+    private inner class Listener(private val listener: AdObjectListener<AdObject>) : AdListener {
 
         override fun onAdLoaded(adView: AdView?) {
             isLoaded = true
 
-            loadListener.onLoaded(this@AppNexusBannerAdObject)
+            listener.onLoaded(this@AppNexusBannerAdObject)
         }
 
         override fun onAdRequestFailed(adView: AdView?, resultCode: ResultCode?) {
-            loadListener.onFailToLoad(this@AppNexusBannerAdObject, "${resultCode?.message}")
+            listener.onFailToLoad(this@AppNexusBannerAdObject, "${resultCode?.message}")
         }
 
         override fun onAdExpanded(adView: AdView?) {
-            Utils.log(this@AppNexusBannerAdObject, "onAdExpanded")
+            listener.onShown(this@AppNexusBannerAdObject)
         }
 
         override fun onAdCollapsed(adView: AdView?) {
@@ -61,7 +61,7 @@ class AppNexusBannerAdObject : ViewAdObject() {
         }
 
         override fun onAdClicked(adView: AdView?) {
-            Utils.log(this@AppNexusBannerAdObject, "onAdClicked")
+            listener.onClicked(this@AppNexusBannerAdObject)
         }
 
         override fun onAdClicked(adView: AdView?, clickUrl: String?) {

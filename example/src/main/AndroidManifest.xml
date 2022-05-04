@@ -22,6 +22,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".AutoRefreshActivity" />
+
         <meta-data
             android:name="applovin.sdk.key"
             android:value="YOUR_SDK_KEY" />

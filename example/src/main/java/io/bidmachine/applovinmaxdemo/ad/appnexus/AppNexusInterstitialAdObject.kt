@@ -3,9 +3,8 @@ package io.bidmachine.applovinmaxdemo.ad.appnexus
 import android.app.Activity
 import com.appnexus.opensdk.*
 import io.bidmachine.applovinmaxdemo.Utils
-import io.bidmachine.applovinmaxdemo.ad.AdObject
-import io.bidmachine.applovinmaxdemo.ad.AdObjectLoadListener
 import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObject
+import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObjectListener
 
 class AppNexusInterstitialAdObject : FullscreenAdObject() {
 
@@ -15,10 +14,10 @@ class AppNexusInterstitialAdObject : FullscreenAdObject() {
 
     private var interstitialAdView: InterstitialAdView? = null
 
-    override fun load(activity: Activity, priceFloor: Double?, loadListener: AdObjectLoadListener<AdObject>) {
+    override fun load(activity: Activity, priceFloor: Double?, listener: FullscreenAdObjectListener) {
         interstitialAdView = InterstitialAdView(activity).apply {
             placementID = PLACEMENT_ID
-            adListener = Listener(loadListener)
+            adListener = Listener(listener)
             loadAd()
         }
     }
@@ -37,26 +36,26 @@ class AppNexusInterstitialAdObject : FullscreenAdObject() {
     }
 
 
-    private inner class Listener(private val loadListener: AdObjectLoadListener<AdObject>) : AdListener {
+    private inner class Listener(private val listener: FullscreenAdObjectListener) : AdListener {
 
         override fun onAdLoaded(adView: AdView?) {
-            loadListener.onLoaded(this@AppNexusInterstitialAdObject)
+            listener.onLoaded(this@AppNexusInterstitialAdObject)
         }
 
         override fun onAdRequestFailed(adView: AdView?, resultCode: ResultCode?) {
-            loadListener.onFailToLoad(this@AppNexusInterstitialAdObject, "${resultCode?.message}")
+            listener.onFailToLoad(this@AppNexusInterstitialAdObject, "${resultCode?.message}")
         }
 
         override fun onAdExpanded(adView: AdView?) {
-            Utils.log(this@AppNexusInterstitialAdObject, "onAdExpanded")
+            listener.onShown(this@AppNexusInterstitialAdObject)
         }
 
         override fun onAdCollapsed(adView: AdView?) {
-            Utils.log(this@AppNexusInterstitialAdObject, "onAdCollapsed")
+            listener.onClosed(this@AppNexusInterstitialAdObject)
         }
 
         override fun onAdClicked(adView: AdView?) {
-            Utils.log(this@AppNexusInterstitialAdObject, "onAdClicked")
+            listener.onClicked(this@AppNexusInterstitialAdObject)
         }
 
         override fun onAdClicked(adView: AdView?, clickUrl: String?) {

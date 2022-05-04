@@ -7,9 +7,8 @@ import com.applovin.mediation.MaxReward
 import com.applovin.mediation.MaxRewardedAdListener
 import com.applovin.mediation.ads.MaxRewardedAd
 import io.bidmachine.applovinmaxdemo.Utils
-import io.bidmachine.applovinmaxdemo.ad.AdObject
-import io.bidmachine.applovinmaxdemo.ad.AdObjectLoadListener
 import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObject
+import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObjectListener
 import io.bidmachine.applovinmaxdemo.ad.max.MaxAdObjectUtils.getCPM
 
 class MaxRewardedAdObject(private val adUnitId: String) : FullscreenAdObject() {
@@ -17,9 +16,9 @@ class MaxRewardedAdObject(private val adUnitId: String) : FullscreenAdObject() {
     private var maxRewardedAd: MaxRewardedAd? = null
     private var price: Double? = null
 
-    override fun load(activity: Activity, priceFloor: Double?, loadListener: AdObjectLoadListener<AdObject>) {
+    override fun load(activity: Activity, priceFloor: Double?, listener: FullscreenAdObjectListener) {
         maxRewardedAd = MaxRewardedAd.getInstance(adUnitId, activity).apply {
-            setListener(Listener(loadListener))
+            setListener(Listener(listener))
             loadAd()
         }
     }
@@ -39,21 +38,21 @@ class MaxRewardedAdObject(private val adUnitId: String) : FullscreenAdObject() {
     }
 
 
-    private inner class Listener(private val loadListener: AdObjectLoadListener<AdObject>) : MaxRewardedAdListener {
+    private inner class Listener(private val listener: FullscreenAdObjectListener) : MaxRewardedAdListener {
 
         override fun onAdLoaded(maxAd: MaxAd) {
             // Extension function to obtain CPM
             price = maxAd.getCPM()
 
-            loadListener.onLoaded(this@MaxRewardedAdObject)
+            listener.onLoaded(this@MaxRewardedAdObject)
         }
 
         override fun onAdLoadFailed(adUnitId: String, maxError: MaxError) {
-            loadListener.onFailToLoad(this@MaxRewardedAdObject, maxError.message)
+            listener.onFailToLoad(this@MaxRewardedAdObject, maxError.message)
         }
 
         override fun onAdDisplayed(maxAd: MaxAd) {
-            Utils.log(this@MaxRewardedAdObject, "onAdDisplayed")
+            listener.onShown(this@MaxRewardedAdObject)
         }
 
         override fun onAdDisplayFailed(maxAd: MaxAd, maxError: MaxError) {
@@ -61,11 +60,11 @@ class MaxRewardedAdObject(private val adUnitId: String) : FullscreenAdObject() {
         }
 
         override fun onAdClicked(maxAd: MaxAd) {
-            Utils.log(this@MaxRewardedAdObject, "onAdClicked")
+            listener.onClicked(this@MaxRewardedAdObject)
         }
 
         override fun onAdHidden(maxAd: MaxAd) {
-            Utils.log(this@MaxRewardedAdObject, "onAdHidden")
+            listener.onClosed(this@MaxRewardedAdObject)
         }
 
         override fun onRewardedVideoStarted(maxAd: MaxAd) {

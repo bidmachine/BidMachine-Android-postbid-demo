@@ -1,6 +1,6 @@
 package io.bidmachine.applovinmaxdemo.ad.max
 
-import android.app.Activity
+import android.content.Context
 import android.view.View
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.MaxAdFormat
@@ -9,7 +9,7 @@ import com.applovin.mediation.MaxError
 import com.applovin.mediation.ads.MaxAdView
 import io.bidmachine.applovinmaxdemo.Utils
 import io.bidmachine.applovinmaxdemo.ad.AdObject
-import io.bidmachine.applovinmaxdemo.ad.AdObjectLoadListener
+import io.bidmachine.applovinmaxdemo.ad.AdObjectListener
 import io.bidmachine.applovinmaxdemo.ad.ViewAdObject
 import io.bidmachine.applovinmaxdemo.ad.max.MaxAdObjectUtils.getCPM
 
@@ -23,10 +23,10 @@ class MaxBannerAdObject(private val adUnitId: String) : ViewAdObject() {
     private var price: Double? = null
     private var isLoaded = false
 
-    override fun load(activity: Activity, priceFloor: Double?, loadListener: AdObjectLoadListener<AdObject>) {
-        maxAdView = MaxAdView(adUnitId, activity).apply {
+    override fun load(context: Context, priceFloor: Double?, listener: AdObjectListener<AdObject>) {
+        maxAdView = MaxAdView(adUnitId, context).apply {
             layoutParams = Utils.createLayoutParams(resources, MAX_SIZE.height)
-            setListener(Listener(loadListener))
+            setListener(Listener(listener))
             loadAd()
         }
     }
@@ -45,7 +45,7 @@ class MaxBannerAdObject(private val adUnitId: String) : ViewAdObject() {
     }
 
 
-    private inner class Listener(private val loadListener: AdObjectLoadListener<AdObject>) : MaxAdViewAdListener {
+    private inner class Listener(private val listener: AdObjectListener<AdObject>) : MaxAdViewAdListener {
 
         override fun onAdLoaded(maxAd: MaxAd) {
             // Switch off auto refresh for MaxAdView
@@ -54,15 +54,15 @@ class MaxBannerAdObject(private val adUnitId: String) : ViewAdObject() {
             price = maxAd.getCPM()
             isLoaded = true
 
-            loadListener.onLoaded(this@MaxBannerAdObject)
+            listener.onLoaded(this@MaxBannerAdObject)
         }
 
         override fun onAdLoadFailed(adUnitId: String, maxError: MaxError) {
-            loadListener.onFailToLoad(this@MaxBannerAdObject, maxError.message)
+            listener.onFailToLoad(this@MaxBannerAdObject, maxError.message)
         }
 
         override fun onAdDisplayed(maxAd: MaxAd) {
-            Utils.log(this@MaxBannerAdObject, "onAdDisplayed")
+            listener.onShown(this@MaxBannerAdObject)
         }
 
         override fun onAdDisplayFailed(maxAd: MaxAd, maxError: MaxError) {
@@ -70,7 +70,7 @@ class MaxBannerAdObject(private val adUnitId: String) : ViewAdObject() {
         }
 
         override fun onAdClicked(maxAd: MaxAd) {
-            Utils.log(this@MaxBannerAdObject, "onAdClicked")
+            listener.onClicked(this@MaxBannerAdObject)
         }
 
         override fun onAdHidden(maxAd: MaxAd) {

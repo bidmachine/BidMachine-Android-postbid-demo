@@ -17,6 +17,9 @@
 
     <string name="bid_machine_seller_id">5</string>
     <string name="inmobi_account_id">_____YOUR_INMOBI_ACCOUNT_ID_____</string>
+    <!--    Change admob_application_id on your application id-->
+    <string name="admob_application_id">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="max_sdk_key">YOUR_MAX_SDK_KEY</string>
     <string name="banner_max_ad_unit_id">YOUR_BANNER_AD_UNIT_ID</string>
     <string name="interstitial_max_ad_unit_id">YOUR_INTERSTITIAL_AD_UNIT_ID</string>
     <string name="rewarded_max_ad_unit_id">YOUR_REWARDED_AD_UNIT_ID</string>

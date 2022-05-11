@@ -26,7 +26,7 @@ abstract class InMobiFullscreenAdObject : FullscreenAdObject() {
 
     override fun canShow(): Boolean = inMobiInterstitial?.isReady == true
 
-    override fun show() {
+    override fun show(activity: Activity) {
         inMobiInterstitial?.show()
     }
 

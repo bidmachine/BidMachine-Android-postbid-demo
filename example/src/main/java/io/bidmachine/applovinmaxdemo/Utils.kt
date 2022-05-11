@@ -2,6 +2,8 @@ package io.bidmachine.applovinmaxdemo
 
 import android.content.Context
 import android.content.res.Resources
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
 import android.view.ViewGroup
@@ -10,6 +12,8 @@ import kotlin.math.roundToInt
 object Utils {
 
     private const val TAG = "MAXPostBidDemo"
+
+    private val uiHandler = Handler(Looper.getMainLooper())
 
     fun createLayoutParams(resources: Resources, height: Int): ViewGroup.LayoutParams {
         return ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -33,6 +37,18 @@ object Utils {
             Log.e(TAG, "[${clazz.simpleName}] $message")
         } else {
             Log.d(TAG, "[${clazz.simpleName}] $message")
+        }
+    }
+
+    fun isUiThread(): Boolean {
+        return Looper.myLooper() == Looper.getMainLooper()
+    }
+
+    fun onUiThread(runnable: Runnable) {
+        if (isUiThread()) {
+            runnable.run()
+        } else {
+            uiHandler.post(runnable)
         }
     }
 

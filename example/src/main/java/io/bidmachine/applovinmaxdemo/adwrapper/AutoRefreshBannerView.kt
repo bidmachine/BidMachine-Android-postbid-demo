@@ -89,7 +89,7 @@ class AutoRefreshBannerView : FrameLayout {
     }
 
     /**
-     * Stops auto-refreshing
+     * Stops auto-refreshing.
      */
     fun stopAutoRefresh() {
         if (!isRefreshStarted) {
@@ -100,7 +100,7 @@ class AutoRefreshBannerView : FrameLayout {
     }
 
     /**
-     * Starts auto-refreshing
+     * Starts auto-refreshing.
      */
     fun startAutoRefresh() {
         if (isRefreshStarted) {

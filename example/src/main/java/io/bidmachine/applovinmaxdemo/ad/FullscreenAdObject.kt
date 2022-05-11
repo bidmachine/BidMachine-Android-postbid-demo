@@ -14,6 +14,6 @@ abstract class FullscreenAdObject : AdObject() {
     /**
      * Shows loaded ad.
      */
-    abstract fun show()
+    abstract fun show(activity: Activity)
 
 }

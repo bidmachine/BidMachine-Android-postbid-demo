@@ -28,7 +28,7 @@ class BidMachineRewardedAdObject : FullscreenAdObject() {
 
     override fun canShow(): Boolean = rewardedAd?.canShow() == true
 
-    override fun show() {
+    override fun show(activity: Activity) {
         rewardedAd?.show()
     }
 

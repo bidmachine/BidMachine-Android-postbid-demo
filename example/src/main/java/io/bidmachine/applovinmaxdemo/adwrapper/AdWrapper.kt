@@ -166,14 +166,14 @@ abstract class AdWrapper<AdWrapperListenerType : AdWrapperListener, AdObjectType
 
         @CallSuper
         override fun onShown(adObject: AdObjectType) {
-            Utils.log(adObject, "onShown")
+            Utils.log(this@AdWrapper, "onAdShown")
 
             listener?.onAdShown()
         }
 
         @CallSuper
         override fun onClicked(adObject: AdObjectType) {
-            Utils.log(adObject, "onClicked")
+            Utils.log(this@AdWrapper, "onAdClicked")
 
             listener?.onAdClicked()
         }

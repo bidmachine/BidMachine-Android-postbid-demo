@@ -2,7 +2,6 @@ package io.bidmachine.applovinmaxdemo.adwrapper
 
 import android.app.Activity
 import io.bidmachine.applovinmaxdemo.Utils
-import io.bidmachine.applovinmaxdemo.ad.AdObject
 import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObject
 import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObjectListener
 import java.lang.ref.WeakReference
@@ -38,11 +37,11 @@ abstract class FullscreenAdWrapper(adUnitId: String) :
     /**
      * Shows ad object with highest price.
      */
-    fun showAd() {
+    fun showAd(activity: Activity) {
         getAdWithHighestPrice()?.also {
             Utils.log(this, "showAd, ${it.javaClass.simpleName} (price: ${it.getPrice()})")
 
-            it.show()
+            it.show(activity)
         } ?: Utils.log(this, "Nothing to show", true)
     }
 
@@ -53,8 +52,8 @@ abstract class FullscreenAdWrapper(adUnitId: String) :
         weakActivity = null
     }
 
-    private fun onAdClosed(adObject: AdObject) {
-        Utils.log(adObject, "onClosed")
+    private fun onAdClosed() {
+        Utils.log(this, "onAdClosed")
 
         listener?.onAdClosed()
     }
@@ -63,7 +62,7 @@ abstract class FullscreenAdWrapper(adUnitId: String) :
     private inner class FullscreenListener : Listener(), FullscreenAdObjectListener {
 
         override fun onClosed(adObject: FullscreenAdObject) {
-            onAdClosed(adObject)
+            onAdClosed()
         }
 
     }
@@ -71,7 +70,7 @@ abstract class FullscreenAdWrapper(adUnitId: String) :
     private inner class FullscreenPostBidListener : PostBidListener(), FullscreenAdObjectListener {
 
         override fun onClosed(adObject: FullscreenAdObject) {
-            onAdClosed(adObject)
+            onAdClosed()
         }
 
     }

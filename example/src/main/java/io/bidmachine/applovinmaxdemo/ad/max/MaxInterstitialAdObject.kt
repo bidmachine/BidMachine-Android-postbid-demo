@@ -26,7 +26,7 @@ class MaxInterstitialAdObject(private val adUnitId: String) : FullscreenAdObject
 
     override fun canShow(): Boolean = maxInterstitialAd?.isReady == true
 
-    override fun show() {
+    override fun show(activity: Activity) {
         maxInterstitialAd?.showAd()
     }
 

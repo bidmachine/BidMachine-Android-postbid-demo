@@ -1,6 +1,7 @@
 package io.bidmachine.applovinmaxdemo.adwrapper
 
 import io.bidmachine.applovinmaxdemo.ad.ViewAdObject
+import io.bidmachine.applovinmaxdemo.ad.admob.AdMobBannerAdObject
 import io.bidmachine.applovinmaxdemo.ad.appnexus.AppNexusBannerAdObject
 import io.bidmachine.applovinmaxdemo.ad.bidmachine.BidMachineBannerAdObject
 import io.bidmachine.applovinmaxdemo.ad.inmobi.InMobiBannerAdObject
@@ -18,6 +19,7 @@ class BannerAdWrapper(adUnitId: String) : ViewAdWrapper(adUnitId) {
      */
     override fun createPostBidAdObjectList(): List<ViewAdObject> = listOf(BidMachineBannerAdObject(),
                                                                           InMobiBannerAdObject(),
-                                                                          AppNexusBannerAdObject())
+                                                                          AppNexusBannerAdObject(),
+                                                                          AdMobBannerAdObject())
 
 }

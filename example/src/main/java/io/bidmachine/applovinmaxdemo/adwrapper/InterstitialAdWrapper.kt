@@ -1,6 +1,7 @@
 package io.bidmachine.applovinmaxdemo.adwrapper
 
 import io.bidmachine.applovinmaxdemo.ad.FullscreenAdObject
+import io.bidmachine.applovinmaxdemo.ad.admob.AdMobInterstitialAdObject
 import io.bidmachine.applovinmaxdemo.ad.appnexus.AppNexusInterstitialAdObject
 import io.bidmachine.applovinmaxdemo.ad.bidmachine.BidMachineInterstitialAdObject
 import io.bidmachine.applovinmaxdemo.ad.inmobi.InMobiInterstitialAdObject
@@ -18,6 +19,7 @@ class InterstitialAdWrapper(adUnitId: String) : FullscreenAdWrapper(adUnitId) {
      */
     override fun createPostBidAdObjectList(): List<FullscreenAdObject> = listOf(BidMachineInterstitialAdObject(),
                                                                                 InMobiInterstitialAdObject(),
-                                                                                AppNexusInterstitialAdObject())
+                                                                                AppNexusInterstitialAdObject(),
+                                                                                AdMobInterstitialAdObject())
 
 }

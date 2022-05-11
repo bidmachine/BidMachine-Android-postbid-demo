@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.applovin.sdk.AppLovinSdk
 import com.appnexus.opensdk.SDKSettings
+import com.google.android.gms.ads.MobileAds
 import com.inmobi.sdk.InMobiSdk
 import io.bidmachine.BidMachine
 import io.bidmachine.applovinmaxdemo.adwrapper.*
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
                 bannerAdWrapper.loadAd(this@MainActivity, BannerAdWrapperListener())
             }
             bShowBanner.setOnClickListener {
+                bShowBanner.isEnabled = false
                 bannerAdWrapper.showAd(adContainer)
             }
             bLoadInterstitial.setOnClickListener {
@@ -49,14 +51,16 @@ class MainActivity : AppCompatActivity() {
                 interstitialAdWrapper.loadAd(this@MainActivity, InterstitialAdWrapperListener())
             }
             bShowInterstitial.setOnClickListener {
-                interstitialAdWrapper.showAd()
+                bShowInterstitial.isEnabled = false
+                interstitialAdWrapper.showAd(this@MainActivity)
             }
             bLoadRewarded.setOnClickListener {
                 bShowRewarded.isEnabled = false
                 rewardedAdWrapper.loadAd(this@MainActivity, RewardedAdWrapperListener())
             }
             bShowRewarded.setOnClickListener {
-                rewardedAdWrapper.showAd()
+                bShowRewarded.isEnabled = false
+                rewardedAdWrapper.showAd(this@MainActivity)
             }
         }
 
@@ -73,6 +77,8 @@ class MainActivity : AppCompatActivity() {
 
         SDKSettings.enableTestMode(true)
         SDKSettings.init(this, {}, true, true)
+
+        MobileAds.initialize(this)
 
         AppLovinSdk.getInstance(this).apply {
             mediationProvider = MEDIATION_PROVIDER

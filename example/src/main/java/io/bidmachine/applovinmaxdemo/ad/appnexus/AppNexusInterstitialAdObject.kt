@@ -26,7 +26,7 @@ class AppNexusInterstitialAdObject : FullscreenAdObject() {
 
     override fun canShow(): Boolean = interstitialAdView?.isReady == true
 
-    override fun show() {
+    override fun show(activity: Activity) {
         interstitialAdView?.show()
     }
 

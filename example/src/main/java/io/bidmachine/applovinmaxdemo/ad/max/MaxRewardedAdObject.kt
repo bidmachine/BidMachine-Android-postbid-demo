@@ -27,7 +27,7 @@ class MaxRewardedAdObject(private val adUnitId: String) : FullscreenAdObject() {
 
     override fun canShow(): Boolean = maxRewardedAd?.isReady == true
 
-    override fun show() {
+    override fun show(activity: Activity) {
         maxRewardedAd?.showAd()
     }
 

@@ -28,7 +28,7 @@ abstract class FullscreenAdWrapper(adUnitId: String) :
     override fun loadPostBidAd(adObject: FullscreenAdObject, priceFloor: Double?) {
         val activity = weakActivity?.get()
         if (activity == null) {
-            onPostBidAdLoadFail(adObject, "Activity is null")
+            onPostBidAdObjectLoadFail(adObject, "Activity is null")
             return
         }
         adObject.load(activity, priceFloor, FullscreenPostBidListener())

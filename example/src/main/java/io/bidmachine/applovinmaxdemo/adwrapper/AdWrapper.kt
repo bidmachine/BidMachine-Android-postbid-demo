@@ -4,32 +4,28 @@ import androidx.annotation.CallSuper
 import io.bidmachine.applovinmaxdemo.Utils
 import io.bidmachine.applovinmaxdemo.ad.AdObject
 import io.bidmachine.applovinmaxdemo.ad.AdObjectListener
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 abstract class AdWrapper<AdWrapperListenerType : AdWrapperListener, AdObjectType : AdObject>(val adUnitId: String) {
 
     private val loadedAdList: MutableList<AdObjectType> = mutableListOf()
-
-    protected var listener: AdWrapperListenerType? = null
+    private val isAdLoadCallbackReached = AtomicBoolean(false)
+    private val postBidAdObjectInProgressCount = AtomicInteger()
 
     private var maxAdObject: AdObjectType? = null
     private var postBidAdObjectList: List<AdObjectType>? = null
-    private var postBidAdObjectInProgressCount = AtomicInteger()
 
-    abstract fun createMaxAdObject(): AdObjectType
+    protected var listener: AdWrapperListenerType? = null
 
-    @CallSuper
-    protected fun setupMaxAdObject(adWrapperListener: AdWrapperListenerType): AdObjectType {
-        destroy()
-        listener = adWrapperListener
+    /**
+     * Returns whether there are loaded ad object.
+     */
+    fun hasLoadedAdObject(): Boolean = loadedAdList.size > 0
 
-        Utils.log(this, "setup max")
-
-        return createMaxAdObject().apply {
-            maxAdObject = this
-        }
-    }
-
+    /**
+     * Clears all objects.
+     */
     @CallSuper
     open fun destroy() {
         Utils.log(this, "destroy")
@@ -45,6 +41,27 @@ abstract class AdWrapper<AdWrapperListenerType : AdWrapperListener, AdObjectType
         loadedAdList.clear()
         maxAdObject?.destroy()
         maxAdObject = null
+    }
+
+    /**
+     * Creates MAX ad object.
+     */
+    abstract fun createMaxAdObject(): AdObjectType
+
+    /**
+     * Setups MAX ad object before load it.
+     */
+    @CallSuper
+    protected fun setupMaxAdObject(adWrapperListener: AdWrapperListenerType): AdObjectType {
+        destroy()
+        listener = adWrapperListener
+
+        Utils.log(this, "setup max")
+
+        isAdLoadCallbackReached.set(false)
+        return createMaxAdObject().apply {
+            maxAdObject = this
+        }
     }
 
     /**
@@ -88,28 +105,43 @@ abstract class AdWrapper<AdWrapperListenerType : AdWrapperListener, AdObjectType
         }
     }
 
+    /**
+     * Indicates that ad object is loaded.
+     */
     private fun onAdObjectLoaded(adObject: AdObjectType) {
         Utils.log(adObject, "onAdObjectLoaded, price - ${adObject.getPrice()}")
 
         loadedAdList.add(adObject)
     }
 
-    private fun onPostBidAdLoadingComplete() {
-        val inProgressCount = postBidAdObjectInProgressCount.decrementAndGet()
-        if (inProgressCount == 0) {
+    /**
+     * Indicates that post bid ad object failed to load.
+     */
+    protected fun onPostBidAdObjectLoadFail(adObject: AdObjectType, errorMessage: String) {
+        Utils.log(adObject, "PostBid onFailToLoad, error - $errorMessage", true)
+
+        onPostBidAdObjectLoadingComplete()
+    }
+
+    /**
+     * Indicates that loading of post bid ad object is completed.
+     */
+    private fun onPostBidAdObjectLoadingComplete() {
+        val postBidInProgressCount = postBidAdObjectInProgressCount.decrementAndGet()
+        if (postBidInProgressCount == 0) {
             onAdLoadingComplete()
         } else {
-            Utils.log(this, "$inProgressCount PostBid object(s) left to load")
+            Utils.log(this, "$postBidInProgressCount PostBid object(s) left to load")
         }
     }
 
-    protected fun onPostBidAdLoadFail(adObject: AdObjectType, errorMessage: String) {
-        Utils.log(adObject, "PostBid onFailToLoad, error - $errorMessage", true)
-
-        onPostBidAdLoadingComplete()
-    }
-
+    /**
+     * Indicates that loading of all ad object is completed.
+     */
     private fun onAdLoadingComplete() {
+        if (isAdLoadCallbackReached.getAndSet(true)) {
+            return
+        }
         val loadedCount = loadedAdList.size
         if (loadedCount == 0) {
             Utils.log(this, "onAdFailToLoad", true)
@@ -147,12 +179,12 @@ abstract class AdWrapper<AdWrapperListenerType : AdWrapperListener, AdObjectType
         override fun onLoaded(adObject: AdObjectType) {
             super.onLoaded(adObject)
 
-            onPostBidAdLoadingComplete()
+            onPostBidAdObjectLoadingComplete()
         }
 
         @CallSuper
         override fun onFailToLoad(adObject: AdObjectType, errorMessage: String) {
-            onPostBidAdLoadFail(adObject, errorMessage)
+            onPostBidAdObjectLoadFail(adObject, errorMessage)
         }
 
     }

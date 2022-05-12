@@ -30,7 +30,7 @@ abstract class ViewAdWrapper(adUnitId: String) : AdWrapper<AdWrapperListener, Vi
     override fun loadPostBidAd(adObject: ViewAdObject, priceFloor: Double?) {
         val context = weakContext?.get()
         if (context == null) {
-            onPostBidAdLoadFail(adObject, "Context is null")
+            onPostBidAdObjectLoadFail(adObject, "Context is null")
             return
         }
         adObject.load(context, priceFloor, PostBidListener())

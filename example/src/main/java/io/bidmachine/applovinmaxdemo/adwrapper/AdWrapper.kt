@@ -11,7 +11,7 @@ abstract class AdWrapper<AdWrapperListenerType : AdWrapperListener, AdObjectType
 
     private val loadedAdList: MutableList<AdObjectType> = mutableListOf()
     private val isAdLoadCallbackReached = AtomicBoolean(false)
-    private val postBidAdObjectInProgressCount = AtomicInteger()
+    private val postBidAdObjectInProgressCount = AtomicInteger(0)
 
     private var maxAdObject: AdObjectType? = null
     private var postBidAdObjectList: List<AdObjectType>? = null

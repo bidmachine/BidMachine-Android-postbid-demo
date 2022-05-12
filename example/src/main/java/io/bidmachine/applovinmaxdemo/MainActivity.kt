@@ -91,10 +91,12 @@ class MainActivity : AppCompatActivity() {
 
         override fun onAdLoaded() {
             binding.bShowBanner.isEnabled = true
+
+            Toast.makeText(this@MainActivity, "Banner loaded", Toast.LENGTH_SHORT).show()
         }
 
         override fun onAdFailToLoad() {
-            Toast.makeText(this@MainActivity, "Banner fail to load", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, "Banner failed to load", Toast.LENGTH_SHORT).show()
         }
 
         override fun onAdShown() {
@@ -111,10 +113,12 @@ class MainActivity : AppCompatActivity() {
 
         override fun onAdLoaded() {
             binding.bShowInterstitial.isEnabled = true
+
+            Toast.makeText(this@MainActivity, "Interstitial loaded", Toast.LENGTH_SHORT).show()
         }
 
         override fun onAdFailToLoad() {
-            Toast.makeText(this@MainActivity, "Interstitial fail to load", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, "Interstitial failed to load", Toast.LENGTH_SHORT).show()
         }
 
         override fun onAdShown() {
@@ -135,10 +139,12 @@ class MainActivity : AppCompatActivity() {
 
         override fun onAdLoaded() {
             binding.bShowRewarded.isEnabled = true
+
+            Toast.makeText(this@MainActivity, "Rewarded loaded", Toast.LENGTH_SHORT).show()
         }
 
         override fun onAdFailToLoad() {
-            Toast.makeText(this@MainActivity, "Rewarded fail to load", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, "Rewarded failed to load", Toast.LENGTH_SHORT).show()
         }
 
         override fun onAdShown() {

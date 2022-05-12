@@ -65,10 +65,12 @@ class AutoRefreshActivity : AppCompatActivity() {
 
         override fun onAdLoaded() {
             binding.bShow.isEnabled = true
+
+            Toast.makeText(this@AutoRefreshActivity, "Banner loaded", Toast.LENGTH_SHORT).show()
         }
 
         override fun onAdFailToLoad() {
-            Toast.makeText(this@AutoRefreshActivity, "Banner fail to load", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@AutoRefreshActivity, "Banner failed to load", Toast.LENGTH_SHORT).show()
         }
 
         override fun onAdShown() {

@@ -28,6 +28,8 @@ see [the official documentation](https://dash.applovin.com/documentation/mediati
 How to load the BidMachine ad object,
 see [the official documentation](https://docs.bidmachine.io/docs/in-house-mediation).
 
+The post bid networks uses the price of loaded MAX ad object to load ads with a higher bid.
+
 Loading the Applovin MAX ad object may finish with two results: ```onAdLoaded``` or ```onAdLoadFailed```
 
 * If loading finished successful, then start load post bid networks with the price from the Applovin MAX
